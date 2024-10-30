@@ -3,7 +3,14 @@ const cors = require('cors')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const app = express()
-app.use(cors())
+
+const corsOptions = {
+  origin: ['https://fsm-three.vercel.app'],
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+// app.use(cors())
+
 app.use(createProxyMiddleware({
   router: (req) => new URL(req.path.substring(1)),
   pathRewrite: (path, req) => (new URL(req.path.substring(1))).pathname,
