@@ -8,6 +8,14 @@ export default async function handler(req, res) {
 
   const targetUrl = `${target}${path ? `/${path}` : ''}`;
 
+  // Handle preflight CORS request
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins; adjust if needed
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).end();
+  }
+
   try {
     const response = await fetch(targetUrl, {
       method: req.method,
@@ -19,6 +27,12 @@ export default async function handler(req, res) {
     });
 
     const responseData = await response.text();
+    
+    // Set CORS headers on the response
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins; adjust if needed
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
     res.status(response.status).send(responseData);
   } catch (error) {
     res.status(500).json({ error: 'Proxy error', details: error.message });
