@@ -1,20 +1,26 @@
-const express = require('express')
-const cors = require('cors')
-const { createProxyMiddleware } = require('http-proxy-middleware')
+// api/proxy.js
+export default async function handler(req, res) {
+  const { target, path } = req.query;
 
-const app = express()
+  if (!target) {
+    return res.status(400).json({ error: "Target URL is required" });
+  }
 
-app.use(cors())
+  const targetUrl = `${target}${path ? `/${path}` : ''}`;
 
-app.use(createProxyMiddleware({
-  router: (req) => new URL(req.path.substring(1)),
-  pathRewrite: (path, req) => (new URL(req.path.substring(1))).pathname,
-  changeOrigin: true,
-  logger: console
-}))
+  try {
+    const response = await fetch(targetUrl, {
+      method: req.method,
+      headers: {
+        ...req.headers,
+        host: new URL(target).host,
+      },
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : undefined,
+    });
 
-app.listen(8088, () => {
-  console.info('Proxy server is running on port 8088')
-})
-
-module.exports = app
+    const responseData = await response.text();
+    res.status(response.status).send(responseData);
+  } catch (error) {
+    res.status(500).json({ error: 'Proxy error', details: error.message });
+  }
+}

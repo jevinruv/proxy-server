@@ -6,22 +6,7 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "index.js",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      "headers": {
-              "Access-Control-Allow-Origin": "*",
-              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
-              "Access-Control-Allow-Credentials": "true"
-      },
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      "dest": "index.js"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "index.js" }
   ]
 }
