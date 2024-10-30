@@ -1,4 +1,3 @@
-// api/proxy.js
 export default async function handler(req, res) {
   const { target, path } = req.query;
 
@@ -17,15 +16,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(targetUrl, {
+
+    const data = {
       method: req.method,
       headers: {
         ...req.headers,
         host: new URL(target).host,
       },
       body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : undefined,
-    });
+    };
 
+    console.log(data);
+
+    const response = await fetch(targetUrl, data);
     const responseData = await response.text();
     
     // Set CORS headers on the response
@@ -34,7 +37,8 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
     res.status(response.status).send(responseData);
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ error: 'Proxy error', details: error.message });
   }
 }
